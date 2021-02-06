@@ -1,0 +1,83 @@
+---
+title: "Homework 1"
+author: Jingyi Zhang
+date: "2/6/21"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(caret)
+library(pls)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+          
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+# Load dataset
+
+```{r}
+sol_test <-
+  read_csv("./data/solubility_test.csv") %>% 
+  janitor::clean_names()
+
+sol_train <-
+  read_csv("./data/solubility_train.csv") %>% 
+  janitor::clean_names()
+
+x_train <- model.matrix(solubility ~ ., sol_train)[ ,-1]
+y_train <- sol_train$solubility
+```
+
+# (a) Fit a linear model using least squares on the training data and calculate the mean squared error using the test data.
+
+```{r}
+set.seed(36) 
+ctrl1 <- trainControl(method = "cv", number = 10)
+fit_lm <- train(solubility~.,
+                data = sol_train,
+                method = "lm",
+                trControl = ctrl1)
+RMSE() 
+```
+
+# (b) Fit a ridge regression model on the training data, with lambda chosen by cross-validation. Report the test error.
+
+```{r}
+
+```
+
+# (c) Fit a lasso model on the training data, with lambda chosen by cross-validation. Report the test error and the number of non-zero coefficient estimates in your model.
+
+```{r}
+
+```
+
+# (d) Fit a principle component regression model on the training data, with M chosen by cross-validation. Report the test error and the value of M selected by cross-validation.
+
+```{r}
+
+```
+
+# (e) Which model will you choose for predicting solubility?
+
+
+
+
+
+
+
+
