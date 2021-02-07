@@ -9,6 +9,7 @@ output: pdf_document
 library(tidyverse)
 library(caret)
 library(pls)
+library(ggplot2)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -42,20 +43,25 @@ sol_train <-
   read_csv("./data/solubility_train.csv") %>% 
   janitor::clean_names()
 
+# training data
 x_train <- model.matrix(solubility ~ ., sol_train)[ ,-1]
 y_train <- sol_train$solubility
+
+# test data
+x_test <- model.matrix(solubility ~ ., sol_test)[ ,-1]
+y_test <- sol_test$solubility
 ```
 
 # (a) Fit a linear model using least squares on the training data and calculate the mean squared error using the test data.
 
 ```{r}
-set.seed(36) 
+set.seed(7) 
 ctrl1 <- trainControl(method = "cv", number = 10)
-fit_lm <- train(solubility~.,
+lm.fit <- train(solubility~.,
                 data = sol_train,
                 method = "lm",
                 trControl = ctrl1)
-RMSE(predict(fit_lm, newdata = sol_test), sol_test$solubility) 
+RMSE(predict(lm.fit, newdata = sol_test), sol_test$solubility) 
 ```
 
 # (b) Fit a ridge regression model on the training data, with lambda chosen by cross-validation. Report the test error.
@@ -113,16 +119,33 @@ pcr.fit <-
         data = sol_train,
         method = "pcr",
         tuneGrid =
-          data.frame(ncomp = 1:19),
+          data.frame(ncomp = seq(1, ncol(x_train))),
         trControl = ctrl2,
         preProcess = c("center", "scale"))
 
+pcr.fit$bestTune
+
+ggplot(pcr.fit, highlight = TRUE) + theme_bw()
+
+RMSE(predict(pcr.fit, x_test), y_test)
+
+mean((predict(pcr.fit, x_test) - y_test)^2)
 ```
 
 # (e) Which model will you choose for predicting solubility?
 
+```{r}
+resamp <- resamples(list(
+                        linear = lm.fit,
+                        ridge = ridge.fit,
+                        lasso = lasso.fit,
+                        pcr = pcr.fit))
+summary(resamp)
 
+bwplot(resamp, metric = "RMSE")
+```
 
+Based on the numeric and graph outputs, lasso model has the smallest mean RMSE among all four models. Lasso will be chosen for predicting solubility.
 
 
 
