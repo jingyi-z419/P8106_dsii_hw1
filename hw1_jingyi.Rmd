@@ -123,13 +123,15 @@ pcr.fit <-
         trControl = ctrl2,
         preProcess = c("center", "scale"))
 
-pcr.fit$bestTune
+pcr.fit$bestTune # value of selected M
 
-ggplot(pcr.fit, highlight = TRUE) + theme_bw()
+ggplot(pcr.fit, highlight = TRUE) + theme_bw() # hard to interpret 
+validationplot(pcr.fit$finalModel, val.type = "MSEP") 
 
-RMSE(predict(pcr.fit, x_test), y_test)
+predy2.pcr2 <- predict(pcr.fit, newdata = x_test)
+mean((y_test - predy2.pcr2)^2) # test MSE
 
-mean((predict(pcr.fit, x_test) - y_test)^2)
+RMSE(predict(pcr.fit, x_test), y_test) # RMSE
 ```
 
 # (e) Which model will you choose for predicting solubility?
