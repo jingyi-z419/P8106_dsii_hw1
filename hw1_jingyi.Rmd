@@ -1,7 +1,8 @@
 ---
-title: "Homework 1"
+title: "P8106 DS II"
+subtitle: "Homework 1"
 author: Jingyi Zhang
-date: "2/6/21"
+date: "Due: 2/14/21"
 output: pdf_document
 ---
 
@@ -9,7 +10,6 @@ output: pdf_document
 library(tidyverse)
 library(caret)
 library(pls)
-library(ggplot2)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -61,7 +61,7 @@ lm.fit <- train(solubility~.,
                 data = sol_train,
                 method = "lm",
                 trControl = ctrl1)
-RMSE(predict(lm.fit, newdata = sol_test), sol_test$solubility) 
+RMSE(predict(lm.fit, newdata = sol_test), sol_test$solubility)^2 
 ```
 
 # (b) Fit a ridge regression model on the training data, with lambda chosen by cross-validation. Report the test error.
@@ -82,7 +82,7 @@ plot(ridge.fit, xTrans = log, pch = 1, col = "light blue")
 
 ridge.fit$bestTune
 
-RMSE(predict(ridge.fit, s = "lambda.min", newx = sol_test), sol_test$solubility)
+RMSE(predict(ridge.fit, s = "lambda.min", newdata = sol_test), sol_test$solubility)^2
 ```
 
 # (c) Fit a lasso model on the training data, with lambda chosen by cross-validation. Report the test error and the number of non-zero coefficient estimates in your model.
@@ -103,7 +103,7 @@ plot(lasso.fit, xTrans = log, col = "light blue", pch = 1)
 
 lasso.fit$bestTune
 
-RMSE(predict(lasso.fit, s = "lambda.min", newx = sol_test), sol_test$solubility)
+RMSE(predict(lasso.fit, s = "lambda.min", newdata = sol_test), sol_test$solubility)^2
 
 sum(coef(lasso.fit$finalModel, lasso.fit$bestTune$lambda) != 0)
 ```
@@ -125,13 +125,9 @@ pcr.fit <-
 
 pcr.fit$bestTune # value of selected M
 
-ggplot(pcr.fit, highlight = TRUE) + theme_bw() # hard to interpret 
 validationplot(pcr.fit$finalModel, val.type = "MSEP") 
 
-predy2.pcr2 <- predict(pcr.fit, newdata = x_test)
-mean((y_test - predy2.pcr2)^2) # test MSE
-
-RMSE(predict(pcr.fit, x_test), y_test) # RMSE
+RMSE(predict(pcr.fit, x_test), y_test)^2 # MSE
 ```
 
 # (e) Which model will you choose for predicting solubility?
